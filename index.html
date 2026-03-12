@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="as">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#8B4513"/>
+  <title>Assamese Panjika</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Panchang engine -->
+  <script src="AASRASH.js"></script>
+
+  <style>
+    /* ============================================================
+       Traditional astrologer color palette
+    ============================================================ */
+    :root{
+      --bg: #f5f1e8;                /* Parchment-like background */
+      --surface: #f9f7f2;           /* Slightly lighter paper */
+      --card: #fffef9;              /* Card background */
+      --text: #2c1810;              /* Deep brown text */
+      --muted: #6b4f3a;             /* Secondary text */
+      --accent: #8B4513;            /* Traditional brown accent */
+      --gold: #b8860b;              /* Divine gold */
+      --red: #8b0000;               /* Deep red */
+      --border: #d4c6b5;            /* Subtle border */
+      --border-strong: #b8860b;     /* Accent border */
+      --shadow: 0 4px 12px rgba(43, 24, 16, 0.08);
+      --radius: 8px;
+      --gap: 16px;
+      --font-as: "Noto Sans Bengali", system-ui, -apple-system, sans-serif;
+      --font-lat: Inter, system-ui, -apple-system, sans-serif;
+    }
+
+    /* ============================================================
+       Base styles with traditional feel
+    ============================================================ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+    
+    body {
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--font-as);
+      line-height: 1.6;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* ============================================================
+       Header with traditional design
+    ============================================================ */
+    header {
+      background: 
+        linear-gradient(to bottom, rgba(139, 69, 19, 0.9), rgba(139, 69, 19, 0.8)),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%238B4513"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23b8860b" stroke-width="1" opacity="0.1"/></svg>');
+      color: #f9f7f2;
+      padding: 16px 0;
+      border-bottom: 3px solid var(--gold);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .nav {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .brand .mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 30%, var(--gold), #daa520);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2c1810;
+      font-size: 20px;
+      font-weight: bold;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(184, 134, 11, 0.5);
+    }
+    
+    .brand .title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    
+    .brand .title .a {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    
+    .brand .title .b {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      font-family: var(--font-lat);
+    }
+    
+    .today-display {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       Main layout
+    ============================================================ */
+    .wrap {
+      max-width: 1000px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    
+    /* Hidden backend panel */
+    #backendPanel[hidden] {
+      display: none !important;
+    }
+
+    /* ============================================================
+       Traditional section styling
+    ============================================================ */
+    .section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin: 0 0 24px 0;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    
+    .section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, var(--accent), var(--gold));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--accent);
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+    
+    .section-title .icon {
+      font-size: 1.5rem;
+    }
+
+    /* ============================================================
+       Panchang highlights with traditional layout - HIDDEN
+    ============================================================ */
+    .panchang-section {
+      display: none !important;
+    }
+    
+    .panchang-highlights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .panchang-item {
+      background: var(--card);
+      border-radius: 6px;
+      padding: 14px;
+      border-left: 4px solid var(--gold);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .panchang-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    
+    .panchang-value {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+    
+    .auspicious-time {
+      background: rgba(184, 134, 11, 0.1);
+      border: 1px dashed var(--gold);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .auspicious-time .icon {
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+    
+    .auspicious-time div {
+      flex: 1;
+    }
+    
+    .auspicious-time .title {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.95rem;
+    }
+    
+    .auspicious-time .desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       Rashifal predictions with astrologer styling
+    ============================================================ */
+    .rashifal-grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .zodiac-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .zodiac-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    
+    .zodiac-header {
+      background: linear-gradient(to right, var(--accent), #a0522d);
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .zodiac-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .zodiac-icon {
+      font-size: 1.4rem;
+    }
+    
+    .current-rashi-badge {
+      background: var(--gold);
+      color: var(--text);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    
+    .zodiac-body {
+      padding: 16px;
+    }
+    
+    .prediction-text {
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    
+    .prediction-aspects {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .aspect {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .aspect-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    
+    .aspect-value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    
+    .remedies-box {
+      background: rgba(139, 69, 19, 0.05);
+      border-radius: 6px;
+      padding: 14px;
+      border-left: 3px solid var(--accent);
+    }
+    
+    .remedies-title {
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .remedies-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+    
+    .remedies-list li {
+      margin: 6px 0;
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .remedies-list strong {
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       Loading animation
+    ============================================================ */
+    .loading {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted);
+      padding: 40px 0;
+      flex-direction: column;
+    }
+    
+    .dotload {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: dotbounce 1s infinite alternate ease;
+    }
+    
+    .dotload:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .dotload:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes dotbounce {
+      to {
+        transform: translateY(-8px);
+        filter: brightness(1.3);
+      }
+    }
+
+    /* ============================================================
+       Traditional footer
+    ============================================================ */
+    footer {
+      background: var(--accent);
+      color: #f9f7f2;
+      text-align: center;
+      padding: 20px 16px;
+      margin-top: 40px;
+      border-top: 3px solid var(--gold);
+    }
+    
+    .footer-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .disclaimer {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       Mobile-specific improvements
+    ============================================================ */
+    @media (max-width: 768px) {
+      .nav {
+        padding: 0 12px;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+      
+      .wrap {
+        padding: 0 12px;
+        margin: 16px auto;
+      }
+      
+      .section {
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .panchang-highlights {
+        grid-template-columns: 1fr;
+      }
+      
+      .rashifal-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .prediction-aspects {
+        grid-template-columns: 1fr;
+      }
+      
+      .brand .title .a {
+        font-size: 1.1rem;
+      }
+      
+      .today-display {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .zodiac-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .current-rashi-badge {
+        align-self: flex-start;
+      }
+    }
+
+    /* ============================================================
+       Utility classes
+    ============================================================ */
+    .text-center {
+      text-align: center;
+    }
+    
+    .mb-1 {
+      margin-bottom: 8px;
+    }
+    
+    .mb-2 {
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <span class="mark">☉</span>
+        <span class="title">
+          <span class="a">আজিৰ ৰাশিফল</span>
+          
+        </span>
+      </div>
+      <div class="today-display" id="todayChip" aria-live="polite">—</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Hidden backend panel -->
+    <section id="backendPanel" hidden>
+      <form id="panchangForm" onsubmit="return false;">
+        <select id="day"></select>
+        <select id="month"></select>
+        <select id="year"></select>
+        <select id="hour"></select>
+        <select id="minute"></select>
+        <select id="ampm"><option value="am">AM</option><option value="pm">PM</option></select>
+        <button type="button" id="calcBtn">calc</button>
+        <button type="button" id="nowBtn">now</button>
+        <span id="calcStatus"></span>
+      </form>
+    </section>
+
+    <!-- Panchang highlights - HIDDEN -->
+    <section class="section panchang-section" aria-label="আজিৰ পাঁচাং" style="display: none;">
+      <div class="section-title">
+        <span class="icon">📅</span>
+        আজিৰ পাঁচাং (Panchang)
+      </div>
+      <p style="color: var(--muted); margin-bottom: 16px; font-style: italic;">
+        বৰ্তমান গ্ৰহ-নক্ষত্ৰৰ অৱস্থান আৰু তিথি-যোগৰ ভিত্তিত আজিৰ শুভ-অশুভ মুহূর্ত
+      </p>
+      
+      <div class="panchang-highlights" aria-live="polite">
+        <div class="panchang-item">
+          <div class="panchang-label">বাৰ</div>
+          <div class="panchang-value" id="dayResult">—</div>
+        </div>
+        <div class="panchang-item">
+          <div class="panchang-label">তিথি</div>
+          <div class="panchang-value" id="tithiResult">—</div>
+        </div>
+        <div class="panchang-item">
+          <div class="panchang-label">নক্ষত্ৰ</div>
+          <div class="panchang-value" id="nakshtraResult">—</div>
+        </div>
+        <div class="panchang-item">
+          <div class="panchang-label">যোগ</div>
+          <div class="panchang-value" id="yogaResult">—</div>
+        </div>
+        <div class="panchang-item">
+          <div class="panchang-label">কৰণ</div>
+          <div class="panchang-value" id="karanResult">—</div>
+        </div>
+        <div class="panchang-item">
+          <div class="panchang-label">চান্দ্ৰমাস</div>
+          <div class="panchang-value" id="lunarMonthResult">—</div>
+        </div>
+      </div>
+      
+      <div class="auspicious-time">
+        <span class="icon">⏳</span>
+        <div>
+          <div class="title" id="auspiciousTitle">শুভ মুহূর্ত</div>
+          <div class="desc" id="auspiciousTime">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rashifal predictions -->
+    <section class="section" aria-labelledby="rashifalTitle">
+      <div class="section-title" id="rashifalTitle">
+        <span class="icon">🔮</span>
+        ৰাশি ভিত্তিক ভৱিষ্যৎবাণী
+      </div>
+      <p style="color: var(--muted); margin-bottom: 16px; font-style: italic;">
+        
+      </p>
+      
+      <div id="rashifalContent" class="rashifal-grid">
+        <div class="loading" role="status" aria-live="polite">
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <span class="dotload"></span>
+            <span class="dotload"></span>
+            <span class="dotload"></span>
+          </div>
+          জ্যোতিষীৰ গণনা চলিত আছে…
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div>Assamese Rashifal by AK </div>
+      <div class="disclaimer">
+        এই ভৱিষ্যৎবাণীসমূহ প্ৰাচীন জ্যোতিষশাস্ত্ৰ আৰু বৰ্তমানৰ গ্ৰহ-নক্ষত্ৰৰ অৱস্থানৰ ভিত্তিত প্ৰস্তুত কৰা হৈছে। 
+        ইয়াক মাৰ্গদৰ্শক হিচাপেহে গণ্য কৰিব।
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Traditional astrologer prediction system
+    const ASTROLOGER_PREDICTION_SYSTEM = {
+      // Traditional tone descriptions
+      TONES: {
+        excellent: {
+          label: "অতি শুভ",
+          description: "গ্ৰহদশা অনুকূল, সকলো কামত সফলতা",
+          color: "#2e7d32"
+        },
+        good: {
+          label: "শুভ",
+          description: "গ্ৰহবল শুভ, কাম-কাজত অগ্ৰগতি",
+          color: "#1976d2"
+        },
+        average: {
+          label: "মিশ্ৰিত",
+          description: "কিছু গ্ৰহদোষ সম্ভৱ, সতৰ্কতা আৱশ্যক",
+          color: "#f57c00"
+        },
+        challenging: {
+          label: "সাবধান",
+          description: "গ্ৰহবল প্ৰতিকূল, ধৈৰ্য্যৰ প্ৰয়োজন",
+          color: "#c62828"
+        }
+      },
+      
+      // Traditional prediction content - EXPANDED TO 25+ ITERATIONS
+      PREDICTIONS: {
+        excellent: [
+          "আজি গ্ৰহদশা আপোনাৰ অনুকূল। যি কোনো নতুন কাম আৰম্ভ কৰিব পাৰে। সূৰ্য্য আৰু বৃহস্পতিৰ দৃষ্টিয়ে সফলতা দিব।",
+          "চন্দ্ৰ আৰু শুক্রৰ মিলনৰ বাবে আজি আপোনাৰ সকলো কামত সফলতা পাব। বিশেষকৈ পাৰিবাৰিক বিষয়ত শুভ ফল পাব।",
+          "বৃহস্পতিৰ দৃষ্টিৰ বাবে আজি আৰ্থিক লাভৰ সম্ভাৱনা। নতুন বিনিয়োগৰ বাবে দিনটো উত্তম।",
+          "সূৰ্য্য আৰু চন্দ্ৰৰ মিলনৰ বাবে আজি আপোনাৰ ব্যক্তিত্বৰ প্ৰভাৱ বৃদ্ধি পাব। নেতৃত্বৰ দক্ষতা দেখুৱাব পাৰিব।",
+          "বৃহস্পতি আৰু শুক্রৰ দৃষ্টিয়ে আজি আপোনাৰ সামাজিক মৰ্যাদা বৃদ্ধি কৰিব। সন্মান লাভৰ সম্ভাৱনা।",
+          "মঙ্গলৰ শুভ দৃষ্টিৰ বাবে আজি সাহস আৰু শক্তি বৃদ্ধি পাব। কঠিন সমস্যাও সমাধান কৰিব পাৰিব।",
+          "চন্দ্ৰৰ প্ৰবল প্ৰভাৱৰ বাবে আজি সৃজনশীলতা বৃদ্ধি পাব। কলা-সংস্কৃতিৰ ক্ষেত্ৰত সফলতা পাব।",
+          "বুধ আৰু গুৰুৰ মিলনৰ বাবে আজি বুদ্ধি আৰু জ্ঞানৰ বিকাশ হ'ব। শিক্ষাৰ ক্ষেত্ৰত উল্লেখযোগ্য সাফল্য।",
+          "শুক্রৰ শুভ দৃষ্টিৰ বাবে আজি প্ৰেম আৰু সম্পৰ্কৰ ক্ষেত্ৰত অতি উত্তম ফল পাব। বিবাহিত জীৱনত সুখ বৃদ্ধি।",
+          "সূৰ্য্যৰ তেজস্বী প্ৰভাৱৰ বাবে আজি আত্মবিশ্বাস বৃদ্ধি পাব। যি কোনো প্ৰতিযোগিতাত জয়লাভৰ সম্ভাৱনা।",
+          "ৰাহুৰ শুভ দৃষ্টিৰ বাবে আজি আধ্যাত্মিক জ্ঞানৰ বিকাশ হ'ব। গুপ্ত জ্ঞান লাভৰ সম্ভাৱনা।",
+          "কেতুৰ শুভ প্ৰভাৱৰ বাবে আজি পূৰ্বজন্মৰ সুকৃতিৰ ফল লাভ কৰিব। ভাগ্যৰ উন্নতি হ'ব।",
+          "শনিৰ শুভ দৃষ্টিৰ বাবে আজি দীৰ্ঘদিনীয়া সমস্যাৰ সমাধান হ'ব। কষ্টৰ পৰা মুক্তি পাব।",
+          "গ্ৰহদশাৰ শুভ সংযোগৰ বাবে আজি আপোনাৰ সকলো ইচ্ছা পূৰণ হ'ব। বিশেষকৈ ধন-সম্পত্তিৰ ক্ষেত্ৰত লাভ।",
+          "নৱগ্ৰহৰ শুভ সংযোগৰ বাবে আজি আপোনাৰ জীৱনত বিশেষ সুযোগৰ সৃষ্টি হ'ব। মহৎ কামত সফলতা।",
+          "চন্দ্ৰ আৰু বুধৰ মিলনৰ বাবে আজি বুদ্ধি আৰু মনৰ সংযোগ ঘটিব। সঠিক সিদ্ধান্ত ল'ব পাৰিব।",
+          "সূৰ্য্য আৰু মঙ্গলৰ মিলনৰ বাবে আজি শক্তি আৰু সাহসৰ সংযোগ ঘটিব। শত্ৰুৰ ওপৰত বিজয় লাভ।",
+          "বৃহস্পতি আৰু শনিৰ মিলনৰ বাবে আজি জ্ঞান আৰু ধৈৰ্য্যৰ সংযোগ ঘটিব। দীৰ্ঘম্যাদী সফলতা লাভ।",
+          "শুক্র আৰু চন্দ্ৰৰ মিলনৰ বাবে আজি সৌন্দৰ্য্য আৰু সংবেদনশীলতা বৃদ্ধি পাব। কলাত্মক কামত সফলতা।",
+          "বুধ আৰু শুক্রৰ মিলনৰ বাবে আজি বুদ্ধি আৰু কৌশলৰ সংযোগ ঘটিব। ব্যৱসায়ত বিশেষ লাভ।",
+          "মঙ্গল আৰু বৃহস্পতিৰ মিলনৰ বাবে আজি কৰ্ম আৰু ভাগ্যৰ সংযোগ ঘটিব। উচ্চপদস্থ লোকৰ সহায়।",
+          "শনি আৰু বুধৰ মিলনৰ বাবে আজি নীতি আৰু বুদ্ধিৰ সংযোগ ঘটিব। আইনী বিষয়ত সফলতা।",
+          "ৰাহু আৰু কেতুৰ শুভ সংযোগৰ বাবে আজি গুপ্ত শক্তিৰ বিকাশ হ'ব। অলৌকিক ঘটনাৰ অভিজ্ঞতা।",
+          "সূৰ্য্য আৰু শনিৰ মিলনৰ বাবে আজি কৰ্তব্য আৰু নেতৃত্বৰ সংযোগ ঘটিব। সমাজত সন্মান বৃদ্ধি।",
+          "চন্দ্ৰ আৰু মঙ্গলৰ মিলনৰ বাবে আজি মনোবল আৰু শক্তি বৃদ্ধি পাব। স্বাস্থ্যৰ উন্নতি ঘটিব।",
+          "বৃহস্পতি আৰু চন্দ্ৰৰ মিলনৰ বাবে আজি ভাগ্য আৰু মনৰ সংযোগ ঘটিব। মানসিক শান্তি লাভ।"
+        ],
+        good: [
+          "মঙ্গল আৰু বুধৰ মিলনৰ বাবে আজি কৰ্মক্ষেত্ৰত অগ্ৰগতি হ'ব। সহকৰ্মীৰ সহযোগিতা পাব।",
+          "শনি আৰু ৰাহুৰ প্ৰভাৱত কিছু বাধা থাকিলেও চন্দ্ৰৰ কৃপাত সামগ্ৰিকভাৱে দিনটো শুভ যাব।",
+          "গুৰুৰ দৃষ্টিৰ বাবে আজি জ্ঞান আৰু শিক্ষাৰ ক্ষেত্ৰত সফলতা পাব। পৰীক্ষাত ভাল ফলৰ সম্ভাৱনা।",
+          "চন্দ্ৰৰ মধ্যম দৃষ্টিৰ বাবে আজি মানসিক স্থিৰতা বজাই ৰাখিব পাৰিব। ভাবনাচিন্তাত স্পষ্টতা থাকিব।",
+          "বুধৰ শুভ প্ৰভাৱৰ বাবে আজি যোগাযোগৰ দক্ষতা বৃদ্ধি পাব। আলোচনা-বিলোচনাত সফলতা।",
+          "শুক্রৰ মধ্যম দৃষ্টিৰ বাবে আজি সামাজিক সম্পৰ্ক উন্নত হ'ব। নতুন বন্ধুত্ব গঢ়ি উঠিব।",
+          "সূৰ্য্যৰ মধ্যম প্ৰভাৱৰ বাবে আজি আত্মসম্মান বজাই ৰাখিব পাৰিব। আত্মীয়-স্বজনৰ সমৰ্থন পাব।",
+          "মঙ্গলৰ মধ্যম দৃষ্টিৰ বাবে আজি শাৰীৰিক শক্তি বজাই ৰাখিব পাৰিব। কঠিন কামত অধ্যৱসায় দেখুৱাব।",
+          "বৃহস্পতিৰ মধ্যম দৃষ্টিৰ বাবে আজি নৈতিকতা আৰু সততাৰ পৰিচয় দিব পাৰিব। সৎ কামৰ প্ৰশংসা পাব।",
+          "শনিৰ মধ্যম দৃষ্টিৰ বাবে আজি দায়িত্ববোধৰ পৰিচয় দিব পাৰিব। কৰ্তব্য পালনত সফলতা।",
+          "ৰাহুৰ মধ্যম প্ৰভাৱৰ বাবে আজি নতুন ধাৰণা আৰু চিন্তাৰ বিকাশ হ'ব। অভিনৱ কাম কৰিব পাৰিব।",
+          "কেতুৰ মধ্যম দৃষ্টিৰ বাবে আজি অন্তৰ্দৃষ্টিৰ বিকাশ হ'ব। সঠিক সিদ্ধান্ত ল'ব পাৰিব।",
+          "গ্ৰহদশাৰ মধ্যম সংযোগৰ বাবে আজি সাধাৰণভাৱে সকলো কামত সফলতা পাব। বিশেষ সমস্যা নাই।",
+          "চন্দ্ৰ আৰু বুধৰ মধ্যম সংযোগৰ বাবে আজি স্মৃতিশক্তি বৃদ্ধি পাব। শিক্ষাৰ ক্ষেত্ৰত অগ্ৰগতি।",
+          "সূৰ্য্য আৰু শুক্রৰ মধ্যম সংযোগৰ বাবে আজি ব্যক্তিত্বৰ মাধুৰ্য বৃদ্ধি পাব। আনৰ মন জয় কৰিব পাৰিব।",
+          "মঙ্গল আৰু শনিৰ মধ্যম সংযোগৰ বাবে আজি কঠিন পৰিশ্ৰমৰ ফল লাভ কৰিব। ধীৰে ধীৰে উন্নতি।",
+          "বৃহস্পতি আৰু বুধৰ মধ্যম সংযোগৰ বাবে আজি জ্ঞান আৰু বুদ্ধিৰ সমন্বয় ঘটিব। শিক্ষকৰ প্ৰশংসা।",
+          "শুক্র আৰু মঙ্গলৰ মধ্যম সংযোগৰ বাবে আজি সাহস আৰু সৌন্দৰ্য্যৰ সমন্বয় ঘটিব। প্ৰেমত অগ্ৰগতি।",
+          "বুধ আৰু শনিৰ মধ্যম সংযোগৰ বাবে আজি বুদ্ধি আৰু ধৈৰ্য্যৰ সমন্বয় ঘটিব। দীৰ্ঘম্যাদী পৰিকল্পনা।",
+          "চন্দ্ৰ আৰু শনিৰ মধ্যম সংযোগৰ বাবে আজি সংবেদনশীলতা আৰু দায়িত্বৰ সমন্বয় ঘটিব। পৰিয়ালৰ কল্যাণ।",
+          "সূৰ্য্য আৰু মঙ্গলৰ মধ্যম সংযোগৰ বাবে আজি আত্মবিশ্বাস আৰু শক্তিৰ সমন্বয় ঘটিব। লক্ষ্যত উপনীত।",
+          "বৃহস্পতি আৰু শুক্রৰ মধ্যম সংযোগৰ বাবে আজি ভাগ্য আৰু সৌন্দৰ্য্যৰ সমন্বয় ঘটিব। সামাজিক সাফল্য।",
+          "ৰাহু আৰু বুধৰ মধ্যম সংযোগৰ বাবে আজি অভিনৱ চিন্তা আৰু বুদ্ধিৰ সমন্বয় ঘটিব। নতুন আৱিষ্কাৰ।",
+          "কেতু আৰু চন্দ্ৰৰ মধ্যম সংযোগৰ বাবে আজি অন্তৰ্দৃষ্টি আৰু সংবেদনশীলতাৰ সমন্বয় ঘটিব। সঠিক অনুভূতি।",
+          "শনি আৰু শুক্রৰ মধ্যম সংযোগৰ বাবে আজি নীতি আৰু সৌন্দৰ্য্যৰ সমন্বয় ঘটিব। শিল্পৰ ক্ষেত্ৰত সাফল্য।"
+        ],
+        average: [
+          "ৰাহু-কেতুৰ প্ৰভাৱত কিছু মনৰ অশান্তি হ'ব পাৰে। গুরুত্বপূর্ণ সিদ্ধান্ত ল'বলৈ এৰাই চলক।",
+          "শনিয়ে কিছু কষ্ট দিব পাৰে, কিন্তু চন্দ্ৰৰ সহায়ত সমস্যাৰ সমাধান হ'ব। ধৈৰ্য্য ধৰি কাম কৰক।",
+          "মঙ্গলৰ প্ৰভাৱত বিতৰ্ক এৰাই চলিবলৈ চেষ্টা কৰক। কথাবতৰাত সংযত হ'বলৈ চেষ্টা কৰক。",
+          "বুধৰ কিছু অশুভ প্ৰভাৱৰ বাবে আজি ভুল বুদ্ধি ল'ব পাৰে। সতৰ্কতা অৱলম্বন কৰক।",
+          "শুক্রৰ মধ্যম প্ৰভাৱত প্ৰেমৰ ক্ষেত্ৰত কিছু বাধা হ'ব পাৰে। ধৈৰ্য্য ধৰি অপেক্ষা কৰক।",
+          "সূৰ্য্যৰ কিছু কঠোৰ প্ৰভাৱৰ বাবে আজি উচ্চপদস্থ লোকৰ সৈতে বিতৰ্ক হ'ব পাৰে। বিনয়ী হ'বলৈ চেষ্টা কৰক।",
+          "চন্দ্ৰৰ অস্থিৰ প্ৰভাৱৰ বাবে আজি মনত উদ্বেগ আৰু উৎকণ্ঠা হ'ব পাৰে। ধ্যান-ধাৰণা কৰক।",
+          "মঙ্গলৰ মধ্যম প্ৰভাৱত শাৰীৰিক কষ্ট হ'ব পাৰে। বিশ্ৰাম লোৱাটো প্ৰয়োজন।",
+          "বৃহস্পতিৰ কিছু দুর্বল দৃষ্টিৰ বাবে আজি নৈতিকতাত কমতি আহিব পাৰে। সচেতন হ'বলৈ চেষ্টা কৰক।",
+          "শনিৰ কঠোৰ প্ৰভাৱৰ বাবে আজি কৰ্তব্যত কিছু ত্ৰুটি হ'ব পাৰে। সতৰ্কতা অৱলম্বন কৰক।",
+          "ৰাহুৰ অস্থিৰ প্ৰভাৱৰ বাবে আজি ভ্ৰান্ত ধাৰণা হ'ব পাৰে। বাস্তৱতাক প্ৰাধান্য দিয়ক।",
+          "কেতুৰ গুপ্ত প্ৰভাৱৰ বাবে আজি অজ্ঞাত শক্তিৰ বাবে সমস্যা হ'ব পাৰে। সতৰ্ক হ'বলৈ চেষ্টা কৰক।",
+          "গ্ৰহদশাৰ সামান্য অশুভ সংযোগৰ বাবে আজি সাধাৰণ সমস্যা হ'ব পাৰে। ধৈৰ্য্য ধৰি কাম কৰক।",
+          "চন্দ্ৰ আৰু ৰাহুৰ সংযোগৰ বাবে আজি মনৰ অস্থিৰতা হ'ব পাৰে। গুরুত্বপূর্ণ সিদ্ধান্ত ল'বলৈ এৰাই চলক।",
+          "সূৰ্য্য আৰু কেতুৰ সংযোগৰ বাবে আজি অহংকাৰ বৃদ্ধি পাব পাৰে। নম্ৰ হ'বলৈ চেষ্টা কৰক।",
+          "মঙ্গল আৰু ৰাহুৰ সংযোগৰ বাবে আজি আকস্মিক দুৰ্ঘটনা হ'ব পাৰে। সতৰ্কতা অৱলম্বন কৰক।",
+          "বৃহস্পতি আৰু কেতুৰ সংযোগৰ বাবে আজি ভ্ৰান্ত ধাৰ্মিকতা হ'ব পাৰে। সঠিক জ্ঞান লাভ কৰক।",
+          "শুক্র আৰু ৰাহুৰ সংযোগৰ বাবে আজি ভ্ৰান্ত প্ৰেমৰ সম্মুখীন হ'ব পাৰে। সচেতন হ'বলৈ চেষ্টা কৰক।",
+          "বুধ আৰু কেতুৰ সংযোগৰ বাবে আজি ভুল তথ্যৰ সম্মুখীন হ'ব পাৰে। প্ৰমাণ নোহোৱাকৈ বিশ্বাস নকৰক।",
+          "শনি আৰু ৰাহুৰ সংযোগৰ বাবে আজি দীৰ্ঘদিনীয়া সমস্যাৰ সৃষ্টি হ'ব পাৰে। ধৈৰ্য্য ধৰি সমাধান কৰক।",
+          "চন্দ্ৰ আৰু কেতুৰ সংযোগৰ বাবে আজি মানসিক চাপ বৃদ্ধি পাব পাৰে। বিশ্ৰাম ল'বলৈ চেষ্টা কৰক।",
+          "সূৰ্য্য আৰু ৰাহুৰ সংযোগৰ বাবে আজি সন্মানহানি হ'ব পাৰে। আত্মসংযণ বজাই ৰাখক।",
+          "মঙ্গল আৰু কেতুৰ সংযোগৰ বাবে আজি শাৰীৰিক আঘাত পাব পাৰে। সতৰ্কতা অৱলম্বন কৰক।",
+          "বৃহস্পতি আৰু ৰাহুৰ সংযোগৰ বাবে আজি ধাৰ্মিক ভ্ৰান্তি হ'ব পাৰে। গুৰুৰ পৰামৰ্শ লওক।",
+          "শুক্র আৰু কেতুৰ সংযোগৰ বাবে আজি প্ৰেমত বাধা হ'ব পাৰে। ধৈৰ্য্য ধৰি অপেক্ষা কৰক।"
+        ],
+        challenging: [
+          "শনি আৰু মঙ্গলৰ মিলনৰ বাবে আজি কিছু অসুবিধাৰ সম্মুখীন হ'ব পাৰে। যাতায়াতত সতৰ্কতা অৱলম্বন কৰক।",
+          "কেতুৰ দৃষ্টিৰ বাবে আজি আৰ্থিক ক্ষতিৰ সম্ভাৱনা। ডাঙৰ খৰচ কৰাত সতৰ্ক হ'ব।",
+          "ৰাহুৰ প্ৰভাৱত স্বাস্থ্যত কিছু সমস্যা হ'ব পাৰে। আহাৰ-বিহাৰত সতৰ্ক হ'বলৈ চেষ্টা কৰক।",
+          "সূৰ্য্য আৰু ৰাহুৰ প্ৰবল বিৰোধী প্ৰভাৱৰ বাবে আজি উচ্চপদস্থ লোকৰ সৈতে বিবাদ হ'ব পাৰে। সংযত হ'বলৈ চেষ্টা কৰক।",
+          "চন্দ্ৰ আৰু কেতুৰ কঠোৰ সংযোগৰ বাবে আজি মানসিক অশান্তি বৃদ্ধি পাব। ধ্যান আৰু বিশ্ৰামৰ প্ৰয়োজন।",
+          "মঙ্গল আৰু শনিৰ কঠোৰ সংযোগৰ বাবে আজি শাৰীৰিক আঘাত পাব পাৰে। শক্তি-সাধনাৰ পৰা বিৰত থাকক।",
+          "বৃহস্পতি আৰু ৰাহুৰ বিৰোধী প্ৰভাৱৰ বাবে আজি ধাৰ্মিক ভ্ৰান্তিত পৰিব পাৰে। সঠিক গুৰুৰ সহায় লওক।",
+          "শুক্র আৰু কেতুৰ কঠোৰ সংযোগৰ বাবে আজি প্ৰেমৰ ক্ষেত্ৰত প্ৰবঞ্চনা হ'ব পাৰে। বিশ্বাসঘাটকতাৰ সন্মুখীন হ'ব পাৰে।",
+          "বুধ আৰু ৰাহুৰ বিৰোধী প্ৰভাৱৰ বাবে আজি মিছা অভিযোগৰ সন্মুখীন হ'ব পাৰে। আইনী সমস্যা হ'ব পাৰে।",
+          "শনি আৰু কেতুৰ কঠোৰ সংযোগৰ বাবে আজি দীৰ্ঘম্যাদী সমস্যাৰ সৃষ্টি হ'ব পাৰে। ধৈৰ্য্য ধৰি সমাধান কৰক।",
+          "সূৰ্য্য আৰু শনিৰ কঠোৰ সংযোগৰ বাবে আজি কৰ্তৃত্বৰ সৈতে সংঘৰ্ষ হ'ব পাৰে। বিনয়ী হ'বলৈ চেষ্টা কৰক।",
+          "চন্দ্ৰ আৰু মঙ্গলৰ বিৰোধী প্ৰভাৱৰ বাবে আজি মানসিক চাপ আৰু ক্ৰোধ বৃদ্ধি পাব। সংযত হ'বলৈ চেষ্টা কৰক।",
+          "বৃহস্পতি আৰু শনিৰ কঠোৰ সংযোগৰ বাবে আজি নৈতিক সংকটৰ সৃষ্টি হ'ব পাৰে। সততা বজাই ৰাখক।",
+          "শুক্র আৰু মঙ্গলৰ বিৰোধী প্ৰভাৱৰ বাবে আজি প্ৰেম আৰু যুদ্ধৰ মাজত সংঘৰ্ষ হ'ব পাৰে। সংযত হ'বলৈ চেষ্টা কৰক।",
+          "বুধ আৰু শনিৰ কঠোৰ সংযোগৰ বাবে আজি বুদ্ধি আৰু নীতিয়ে সংঘৰ্ষ কৰিব। সঠিক সিদ্ধান্ত ল'বলৈ কষ্ট হ'ব।",
+          "ৰাহু আৰু কেতুৰ কঠোৰ সংযোগৰ বাবে আজি মনৰ অস্থিৰতা চৰম স্তৰত পাব। আধ্যাত্মিক অনুশীলনৰ প্ৰয়োজন।",
+          "সূৰ্য্য আৰু মঙ্গলৰ কঠোৰ সংযোগৰ বাবে আজি শক্তিৰ অপব্যৱহাৰ হ'ব পাৰে। ক্ৰোধ নিয়ন্ত্ৰণ কৰক।",
+          "চন্দ্ৰ আৰু শনিৰ বিৰোধী প্ৰভাৱৰ বাবে আজি পৰিয়ালৰ মাজত সংঘৰ্ষ হ'ব পাৰে। শান্তি ৰক্ষাৰ চেষ্টা কৰক।",
+          "বৃহস্পতি আৰু মঙ্গলৰ কঠোৰ সংযোগৰ বাবে আজি ধৰ্ম আৰু যুদ্ধৰ মাজত সংঘৰ্ষ হ'ব পাৰে। শান্তিৰ পথ অনুসৰণ কৰক।",
+          "শুক্র আৰু শনিৰ বিৰোধী প্ৰভাৱৰ বাবে আজি প্ৰেম আৰু কৰ্তব্যৰ মাজত সংঘৰ্ষ হ'ব পাৰে। সমন্বয় ৰক্ষা কৰক।",
+          "বুধ আৰু মঙ্গলৰ কঠোৰ সংযোগৰ বাবে আজি বুদ্ধি আৰু শক্তিৰ সংঘৰ্ষ হ'ব পাৰে। কৌশলপূৰ্ণ হ'বলৈ চেষ্টা কৰক।",
+          "ৰাহু আৰু শনিৰ কঠোৰ সংযোগৰ বাবে আজি গুপ্ত শক্তিৰ বিৰুদ্ধে যুঁজ দিব লাগিব। আধ্যাত্মিক শক্তি বৃদ্ধি কৰক।",
+          "কেতু আৰু মঙ্গলৰ বিৰোধী প্ৰভাৱৰ বাবে আজি অদৃশ্য শক্তিৰ সৈতে সংঘৰ্ষ হ'ব পাৰে। সতৰ্ক হ'বলৈ চেষ্টা কৰক।",
+          "সূৰ্য্য আৰু বুধৰ কঠোৰ সংযোগৰ বাবে আজি নেতৃত্ব আৰু বুদ্ধিৰ সংঘৰ্ষ হ'ব পাৰে। সংযত হ'বলৈ চেষ্টা কৰক।",
+          "চন্দ্ৰ আৰু বুধৰ বিৰোধী প্ৰভাৱৰ বাবে আজি মন আৰু বুদ্ধিৰ সংঘৰ্ষ হ'ব পাৰে। ধ্যানৰ দ্বাৰা সমাধান কৰক।"
+        ]
+      },
+      
+      // Traditional aspects of life - EXPANDED TO 25+ ITERATIONS
+      ASPECTS: {
+        career: [
+          "কৰ্মক্ষেত্ৰত উন্নতি পাব",
+          "নতুন দায়িত্ব পাব",
+          "সহকৰ্মীৰ সহযোগ পাব",
+          "প্ৰমোচনৰ সম্ভাৱনা",
+          "ব্যৱসায়ত সম্প্ৰসাৰণ",
+          "নতুন চাকৰিৰ সুযোগ",
+          "প্ৰকল্পত সফলতা",
+          "বিজনেছ ভ্ৰমণৰ সুযোগ",
+          "উচ্চপদস্থ লোকৰ সৈতে সাক্ষাৎ",
+          "কৰ্মক্ষেত্ৰত সন্মান লাভ",
+          "নতুন কৌশল শিকাৰ সুযোগ",
+          "দীৰ্ঘম্যাদী পৰিকল্পনা সফল",
+          "কৰ্মৰ প্ৰশংসা পাব",
+          "নেতৃত্বৰ দক্ষতা বৃদ্ধি",
+          "কৰ্মসংস্থানৰ সুবিধা",
+          "আন্তৰ্জাতিক সুযোগ",
+          "পেছাগত উন্নতি",
+          "নতুন অংশীদাৰী",
+          "কন্ট্ৰাক্ট লাভ",
+          "কৰ্মক্ষেত্ৰত শান্তি",
+          "দলগত কামত সফলতা",
+          "নতুন টেকন'লজি শিকিব",
+          "কৰ্মৰ গতি বৃদ্ধি",
+          "কৰ্মক্ষেত্ৰত সৃষ্টিশীলতা",
+          "কৰ্মৰ মান উন্নতি"
+        ],
+        finance: [
+          "আৰ্থিক লাভ পাব",
+          "বিনিয়োগৰ সুযোগ পাব",
+          "অপ্ৰত্যাশিত আয় পাব",
+          "খৰচ নিয়ন্ত্ৰণ কৰক",
+          "ধনৰ আগমন বৃদ্ধি",
+          "পুৰণি ঋণৰ পৰিশোধ",
+          "বেংকৰ পৰা সুবিধা",
+          "বিনিয়োগত লাভ",
+          "সম্পত্তিৰ লেনদেন",
+          "আৰ্থিক স্থিৰতা",
+          "বৰঙণি লাভ",
+          "উপহাৰ পাব",
+          "জুৱাখেলত লাভ",
+          "ষ্টক মাৰ্কেটত লাভ",
+          "ব্যৱসায়ত লাভ",
+          "কমিচন বৃদ্ধি",
+          "বেতন বৃদ্ধি",
+          "বোনাছ লাভ",
+          "আৰ্থিক সঙ্কটৰ সমাধান",
+          "সঞ্চয় বৃদ্ধি",
+          "ধন উদ্ধাৰ",
+          "অনুদান লাভ",
+          "বীমা দাবীৰ লাভ",
+          "উত্তৰাধিকাৰী সম্পত্তি",
+          "আৰ্থিক নিৰাপত্তা"
+        ],
+        love: [
+          "পাৰিবাৰিক শান্তি পাব",
+          "সম্পৰ্কত মধুৰতা পাব",
+          "বিবাহৰ প্ৰস্তাৱ পাব",
+          "প্ৰেমত সফলতা পাব",
+          "প্ৰেমিক-প্ৰেমিকাৰ সৈতে মিলন",
+          "বিবাহিত জীৱনত সুখ",
+          "প্ৰেমৰ বিষয়ত বুজাবুজি",
+          "পৰিয়ালৰ সমৰ্থন",
+          "প্ৰেমত প্ৰগতি",
+          "বিবাহৰ ব্যৱস্থা",
+          "প্ৰেমৰ সন্ধানত সফলতা",
+          "সম্পৰ্ক দীৰ্ঘস্থায়ী",
+          "পাৰিবাৰিক মিলন",
+          "প্ৰেমত বিশ্বাসযোগ্যতা",
+          "হৃদয়ৰ ইচ্ছা পূৰণ",
+          "প্ৰেমিকৰ পৰা উপহাৰ",
+          "ৰোমাণ্টিক ভ্ৰমণ",
+          "প্ৰেমৰ কথা পাতন",
+          "বিবাহৰ পৰিকল্পনা",
+          "প্ৰেমত নিষ্ঠা",
+          "সম্পৰ্কত বিশ্বাস",
+          "পাৰিবাৰিক সম্মতি",
+          "প্ৰেমৰ বন্ধন শক্তিশালী",
+          "বিবাহৰ শুভ মুহূর্ত",
+          "প্ৰেমৰ ক্ষেত্ৰত সৌভাগ্য"
+        ],
+        health: [
+          "শৰীৰত বল পাব",
+          "মানসিক শান্তি পাব",
+          "ৰোগমুক্তি হব",
+          "ব্যায়ামৰ সুফল পাব",
+          "শাৰীৰিক শক্তি বৃদ্ধি",
+          "মানসিক চাপ হ্ৰাস",
+          "ৰোগ প্ৰতিৰোধ ক্ষমতা",
+          "শৰীৰত সতেজতা",
+          "উপযুক্ত ওজন বজাই ৰাখক",
+          "নিয়মিত ব্যায়াম কৰক",
+          "সুষম আহাৰ গ্রহণ কৰক",
+          "মানসিক স্বাস্থ্যৰ উন্নতি",
+          "দীৰ্ঘজীৱন লাভ",
+          "শৰীৰৰ গঠন উন্নতি",
+          "আহাৰৰ প্ৰতি সচেতনতা",
+          "নিদ্ৰাৰ গুণগত মান",
+          "শৰীৰত কোমলতা বজাই ৰাখক",
+          "মানসিক স্থিৰতা",
+          "শ্বাস-প্ৰশ্বাসৰ উন্নতি",
+          "ৰক্তচাপ নিয়ন্ত্ৰণ",
+          "হজম শক্তি বৃদ্ধি",
+          "চৰ্মৰ উজ্জ্বলতা",
+          "চকুৰ দৃষ্টি শক্তি",
+          "চুলিৰ স্বাস্থ্য",
+          "স্বাস্থ্যকৰ অভ্যাস"
+        ]
+      }
+    };
+
+    // Traditional zodiac data
+    const ZODIAC = [
+      { name: "মেষ", english: "Aries", ruler: "মঙ্গল", icon: "♈", element: "অগ্নি" },
+      { name: "বৃষ", english: "Taurus", ruler: "শুক্ৰ", icon: "♉", element: "পৃথিৱী" },
+      { name: "মিথুন", english: "Gemini", ruler: "বুধ", icon: "♊", element: "বায়ু" },
+      { name: "কর্কট", english: "Cancer", ruler: "চন্দ্ৰ", icon: "♋", element: "জল" },
+      { name: "সিংহ", english: "Leo", ruler: "সূৰ্য্য", icon: "♌", element: "অগ্নি" },
+      { name: "কন্যা", english: "Virgo", ruler: "বুধ", icon: "♍", element: "পৃথিৱী" },
+      { name: "তুলা", english: "Libra", ruler: "শুক্ৰ", icon: "♎", element: "বায়ু" },
+      { name: "বৃশ্চিক", english: "Scorpio", ruler: "মঙ্গল", icon: "♏", element: "জল" },
+      { name: "ধনু", english: "Sagittarius", ruler: "বৃহস্পতি", icon: "♐", element: "অগ্নি" },
+      { name: "মকৰ", english: "Capricorn", ruler: "শনি", icon: "♑", element: "পৃথিৱী" },
+      { name: "কুম্ভ", english: "Aquarius", ruler: "শনি", icon: "♒", element: "বায়ু" },
+      { name: "মীন", english: "Pisces", ruler: "বৃহস্পতি", icon: "♓", element: "জল" }
+    ];
+
+    // Traditional remedies
+    const TRADITIONAL_REMEDIES = {
+      mantra: {
+        "মঙ্গল": "ॐ क्रां क्रीं क्रौं सः भौमाय नमः",
+        "শুক্ৰ": "ॐ द्रां द्रीं द्रौं सः शुक्राय नमः",
+        "বুধ": "ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः",
+        "চন্দ্ৰ": "ॐ श्रां श्रीं श्रौं सः चन्द्राय नमः",
+        "সূৰ্য্য": "ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः",
+        "বৃহস্পতি": "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः",
+        "শনি": "ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः"
+      },
+      donation: {
+        "মঙ্গল": "ৰঙা ৰঙৰ বস্তু, মচুৰ ডাইল",
+        "শুক্ৰ": "চাউল, সোঁফ, মিঠাই",
+        "বুধ": "সেউজীয়া ৰঙৰ বস্তু, কিতাপ",
+        "চন্দ্ৰ": "গাখীৰ, ভিজা চাউল",
+        "সূৰ্য্য": "গুড়, গম",
+        "বৃহস্পতি": "হালধীয়া ৰঙৰ বস্তু, চানা ডাইল",
+        "শনি": "ক'লা তিল, লোহাৰ বস্তু"
+      },
+      dayBased: {
+        "সোমবাৰ": "শিৱলিঙ্গত জল, গাখীৰ দান",
+        "মঙলবাৰ": "হনুমান চালিসা পাঠ, ৰঙা ফুল",
+        "বুধবাৰ": "বুধৰ মন্ত্ৰ জাপ (ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः।।), সেউজীয়া বস্তু দান",
+        "বৃহস্পতিবাৰ": "বৃহস্পতিৰ মন্ত্ৰ জাপ (ॐ ग्रां ग्रीं ग्रौं सः गुरुवे नमः!), হালধীয়া বস্ত্ৰ দান",
+        "শুক্ৰবাৰ": "লক্ষ্মী পূজা, সোঁফ দান",
+        "শনিবাৰ": "শনি মন্ত্ৰ জাপ(ॐ शनि शनिस्चराये नमः।।), তিল দান",
+        "দেওবাৰ": "সূৰ্য্যক অৰ্ঘ্য, ৰক্তবৰ্ণ ফুল"
+      }
+    };
+
+    // Traditional hash function for prediction consistency
+    function traditionalHash(s) {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) {
+        h = ((h << 5) - h) + s.charCodeAt(i);
+        h |= 0;
+      }
+      return Math.abs(h);
+    }
+
+    // Traditional prediction algorithm
+    function traditionalPredict(sign, panchang) {
+      const day = panchang?.Day?.name || "";
+      const tithi = panchang?.Tithi?.name || "";
+      const nakshatra = panchang?.Nakshatra?.name || "";
+      const yoga = panchang?.Yoga?.name || "";
+      
+      const hash = traditionalHash(`${day}|${tithi}|${nakshatra}|${yoga}|${sign.name}|${sign.ruler}`);
+      
+      // Weighted tone selection based on traditional astrology
+      const weights = [0.2, 0.35, 0.3, 0.15]; // excellent, good, average, challenging
+      let cumulative = 0;
+      const randomValue = (hash % 100) / 100;
+      const tones = Object.keys(ASTROLOGER_PREDICTION_SYSTEM.TONES);
+      
+      let selectedTone = tones[0];
+      for (let i = 0; i < tones.length; i++) {
+        cumulative += weights[i];
+        if (randomValue <= cumulative) {
+          selectedTone = tones[i];
+          break;
+        }
+      }
+      
+      // Select prediction aspects
+      const pick = (arr, h) => arr[h % arr.length];
+      
+      return {
+        tone: selectedTone,
+        prediction: pick(ASTROLOGER_PREDICTION_SYSTEM.PREDICTIONS[selectedTone], hash),
+        career: pick(ASTROLOGER_PREDICTION_SYSTEM.ASPECTS.career, hash),
+        finance: pick(ASTROLOGER_PREDICTION_SYSTEM.ASPECTS.finance, hash),
+        love: pick(ASTROLOGER_PREDICTION_SYSTEM.ASPECTS.love, hash),
+        health: pick(ASTROLOGER_PREDICTION_SYSTEM.ASPECTS.health, hash)
+      };
+    }
+
+    // Traditional remedies composition
+    function getTraditionalRemedies(sign, panchang) {
+      const day = panchang?.Day?.name || "";
+      const ruler = sign.ruler;
+      
+      return [
+        { label: "আধিপত্য গ্ৰহ", text: ruler },
+        { label: "বীজ মন্ত্ৰ", text: TRADITIONAL_REMEDIES.mantra[ruler] || "—", lang: "sa" },
+        { label: "দানীয় বস্তু", text: TRADITIONAL_REMEDIES.donation[ruler] || "—" },
+        { label: "দিন বিশেষ প্ৰতিকাৰ", text: TRADITIONAL_REMEDIES.dayBased[day] || TRADITIONAL_REMEDIES.dayBased[day] || "—" }
+      ];
+    }
+
+    // Build traditional rashifal
+    function buildTraditionalRashifal(panchang) {
+      const wrap = document.getElementById("rashifalContent");
+      wrap.innerHTML = "";
+
+      const currentRashi = panchang?.Raasi?.name ? String(panchang.Raasi.name).trim() : "";
+      
+      ZODIAC.forEach((sign, index) => {
+        const prediction = traditionalPredict(sign, panchang);
+        const remedies = getTraditionalRemedies(sign, panchang);
+        const isCurrentRashi = sign.english.toLowerCase() === currentRashi.toLowerCase() || 
+                              sign.name === currentRashi;
+        
+        const card = document.createElement('article');
+        card.className = 'zodiac-card';
+        card.setAttribute('aria-label', `${sign.name} ৰাশিৰ ভৱিষ্যৎবাণী`);
+        
+        const header = `
+          <div class="zodiac-header">
+            <div class="zodiac-name">
+              <span class="zodiac-icon">${sign.icon}</span>
+              ${sign.name} (${sign.english})
+            </div>
+            ${isCurrentRashi ? '<div class="current-rashi-badge">আজিৰ ৰাশি</div>' : ''}
+          </div>
+        `;
+        
+        const body = `
+          <div class="zodiac-body">
+            <div class="prediction-text">${prediction.prediction}</div>
+            
+            <div class="prediction-aspects">
+              <div class="aspect">
+                <div class="aspect-label">কৰ্মজীৱন</div>
+                <div class="aspect-value">${prediction.career}</div>
+              </div>
+              <div class="aspect">
+                <div class="aspect-label">অৰ্থনৈতিক</div>
+                <div class="aspect-value">${prediction.finance}</div>
+              </div>
+              <div class="aspect">
+                <div class="aspect-label">প্ৰেম-সম্পৰ্ক</div>
+                <div class="aspect-value">${prediction.love}</div>
+              </div>
+              <div class="aspect">
+                <div class="aspect-label">স্বাস্থ্য</div>
+                <div class="aspect-value">${prediction.health}</div>
+              </div>
+            </div>
+            
+            <div class="remedies-box">
+              <div class="remedies-title">📿 প্ৰতিকাৰৰ উপায়</div>
+              <ul class="remedies-list">
+                ${remedies.map(r => 
+                  `<li><strong>${r.label}:</strong> ${r.lang === "sa" ? `<span lang="sa">${r.text}</span>` : r.text}</li>`
+                ).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+        
+        card.innerHTML = header + body;
+        wrap.appendChild(card);
+      });
+    }
+
+    // Fill panchang highlights (kept for backend functionality)
+    function fillPanchangHighlights(panchang) {
+      const safe = k => (panchang[k] && panchang[k].name) ? panchang[k].name : (panchang[k] ? String(panchang[k]) : "—");
+      
+      // These elements are hidden but still updated for backend functionality
+      document.getElementById("dayResult").textContent = safe("Day");
+      document.getElementById("tithiResult").textContent = safe("Tithi");
+      document.getElementById("nakshtraResult").textContent = safe("Nakshatra");
+      document.getElementById("yogaResult").textContent = safe("Yoga");
+      document.getElementById("karanResult").textContent = safe("Karan") || "—";
+      document.getElementById("lunarMonthResult").textContent = safe("LunarMonth") || "—";
+      
+      // Set auspicious time based on panchang
+      const day = safe("Day");
+      const nakshatra = safe("Nakshatra");
+      let auspiciousTime = "—";
+      
+      if (nakshatra.includes("ৰোহিণী") || nakshatra.includes("উত্তৰ") || nakshatra.includes("শ্রবণ")) {
+        auspiciousTime = "সকাল ৯:০০ - ১১:০০";
+      } else if (nakshatra.includes("পুষ্যা") || nakshatra.includes("মৃগশিৰা") || nakshatra.includes("হস্ত")) {
+        auspiciousTime = "দুপৰীয়া ১২:০০ - ২:০০";
+      } else if (nakshatra.includes("অনুৰাধা") || nakshatra.includes("স্বাতী") || nakshatra.includes("পুনর্বসু")) {
+        auspiciousTime = "আবেলি ৪:০০ - ৬:০০";
+      }
+      
+      document.getElementById("auspiciousTime").textContent = auspiciousTime;
+    }
+
+    // Backend date/time functions
+    function populateDropdowns() {
+      const d = document.getElementById("day"), 
+            m = document.getElementById("month"), 
+            y = document.getElementById("year");
+      const cy = new Date().getFullYear();
+      d.innerHTML = ""; 
+      for (let i = 1; i <= 31; i++) {
+        d.insertAdjacentHTML('beforeend', `<option value="${i}">${i}</option>`);
+      }
+      const months = ["January", "February", "March", "April", "May", "June", 
+                     "July", "August", "September", "October", "November", "December"];
+      m.innerHTML = ""; 
+      months.forEach((mm, i) => {
+        m.insertAdjacentHTML('beforeend', `<option value="${i + 1}">${mm}</option>`);
+      });
+      y.innerHTML = ""; 
+      for (let yy = cy; yy >= 1900; yy--) {
+        y.insertAdjacentHTML('beforeend', `<option value="${yy}">${yy}</option>`);
+      }
+    }
+
+    function populateTimeDropdowns() {
+      const h = document.getElementById("hour"), 
+            min = document.getElementById("minute");
+      h.innerHTML = ""; 
+      for (let i = 1; i <= 12; i++) {
+        h.insertAdjacentHTML('beforeend', `<option value="${i}">${i}</option>`);
+      }
+      min.innerHTML = ""; 
+      for (let i = 0; i <= 59; i++) {
+        min.insertAdjacentHTML('beforeend', `<option value="${i}">${i < 10 ? "0" + i : i}</option>`);
+      }
+    }
+
+    function setCurrentDateTime(dateObj = new Date()) {
+      const d = dateObj.getDate(), 
+            mo = dateObj.getMonth() + 1, 
+            y = dateObj.getFullYear();
+      let hrs = dateObj.getHours(), 
+          mins = dateObj.getMinutes();
+      const ampm = hrs >= 12 ? "pm" : "am";
+      let h12 = hrs % 12; 
+      h12 = h12 ? h12 : 12;
+      document.getElementById("day").value = d;
+      document.getElementById("month").value = mo;
+      document.getElementById("year").value = y;
+      document.getElementById("hour").value = h12;
+      document.getElementById("minute").value = mins;
+      document.getElementById("ampm").value = ampm;
+      document.getElementById("todayChip").textContent = dateObj.toLocaleString(undefined, {
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+    }
+
+    function buildDateFromSelects() {
+      const d = +document.getElementById("day").value;
+      const mo = +document.getElementById("month").value;
+      const y = +document.getElementById("year").value;
+      let h = +document.getElementById("hour").value;
+      const mi = +document.getElementById("minute").value;
+      const ap = document.getElementById("ampm").value;
+      if (ap === "pm" && h !== 12) h += 12;
+      if (ap === "am" && h === 12) h = 0;
+      return new Date(y, mo - 1, d, h, mi, 0, 0);
+    }
+
+    function calculatePanchang(overrideDate = null) {
+      const when = overrideDate instanceof Date ? overrideDate : buildDateFromSelects();
+      try {
+        if (!window.panchang || typeof window.panchang.calculate !== "function") {
+          setTimeout(() => calculatePanchang(overrideDate), 250);
+          return;
+        }
+        let usedCb = false;
+        try {
+          panchang.calculate(when, () => {
+            usedCb = true;
+            update();
+          });
+        } catch (e) {
+          try {
+            panchang.calculate(when);
+            update();
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        setTimeout(() => {
+          if (!usedCb) update();
+        }, 700);
+      } catch (err) {
+        console.error(err);
+      }
+      
+      function update() {
+        const p = window.panchang || {};
+        fillPanchangHighlights(p);
+        buildTraditionalRashifal(p);
+      }
+    }
+
+    function init() {
+      populateDropdowns();
+      populateTimeDropdowns();
+      setCurrentDateTime(new Date());
+      setTimeout(() => calculatePanchang(new Date()), 200);
+      document.getElementById('calcBtn').addEventListener('click', () => calculatePanchang());
+      document.getElementById('nowBtn').addEventListener('click', () => {
+        setCurrentDateTime(new Date());
+        calculatePanchang(new Date());
+      });
+      document.getElementById('panchangForm').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          calculatePanchang();
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+
+    // Gentle retry if engine was late
+    setTimeout(() => {
+      if (document.getElementById("dayResult").textContent === '—') {
+        try {
+          calculatePanchang(new Date());
+        } catch (_) {}
+      }
+    }, 1600);
+  </script>
+</body>
+</html>
