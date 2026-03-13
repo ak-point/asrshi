@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daily Horoscope</title>
+
+<style>
+
+body{
+font-family:Arial, sans-serif;
+background:#f4f6fb;
+margin:0;
+padding:20px;
+text-align:center;
+}
+
+h1{
+color:#6a1b9a;
+margin-bottom:5px;
+}
+
+#liveTime{
+margin-bottom:25px;
+color:#555;
+font-size:14px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:20px;
+max-width:1200px;
+margin:auto;
+}
+
+.card{
+background:white;
+border-radius:14px;
+padding:18px;
+box-shadow:0 6px 14px rgba(0,0,0,0.12);
+text-align:left;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 10px 25px rgba(0,0,0,0.18);
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:22px;
+}
+
+.card h2{
+margin:0;
+color:#6a1b9a;
+}
+
+.section{
+margin-top:8px;
+font-size:14px;
+}
+
+.lucky{
+margin-top:10px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Daily Horoscope</h1>
+<div id="liveTime"></div>
+
+<div class="grid" id="horoscopeCards"></div>
+
+<script>
+
+const zodiacSigns=[
+{name:"Aries",icon:"♈"},
+{name:"Taurus",icon:"♉"},
+{name:"Gemini",icon:"♊"},
+{name:"Cancer",icon:"♋"},
+{name:"Leo",icon:"♌"},
+{name:"Virgo",icon:"♍"},
+{name:"Libra",icon:"♎"},
+{name:"Scorpio",icon:"♏"},
+{name:"Sagittarius",icon:"♐"},
+{name:"Capricorn",icon:"♑"},
+{name:"Aquarius",icon:"♒"},
+{name:"Pisces",icon:"♓"}
+];
+
+const lovePredictions=[
+"Romantic energy surrounds you today.",
+"A meaningful conversation will strengthen your relationship.",
+"Spend quality time with someone special.",
+"New love opportunities may appear.",
+"Patience will improve your relationship.",
+"Express your feelings openly today."
+];
+
+const careerPredictions=[
+"Work opportunities may appear today.",
+"Your leadership will be recognized.",
+"Focus and determination will bring success.",
+"A new project may bring growth.",
+"Teamwork will help achieve goals.",
+"Stay organized for better results."
+];
+
+const healthPredictions=[
+"Take time to relax and recharge.",
+"A short walk will refresh your mind.",
+"Focus on balanced nutrition today.",
+"Stay hydrated and maintain energy.",
+"Light exercise will boost your mood.",
+"Rest is important today."
+];
+
+const colors=["Red","Blue","Green","Yellow","Purple","Orange","Gold","Silver"];
+
+function getTodayKey(){
+const today=new Date();
+return today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+}
+
+function hashCode(str){
+let hash=0;
+for(let i=0;i<str.length;i++){
+hash=str.charCodeAt(i)+((hash<<5)-hash);
+}
+return Math.abs(hash);
+}
+
+function generateHoroscope(){
+
+const today=getTodayKey();
+
+const container=document.getElementById("horoscopeCards");
+container.innerHTML="";
+
+zodiacSigns.forEach(sign=>{
+
+const seed=today+sign.name;
+
+const love=lovePredictions[hashCode(seed+"love")%lovePredictions.length];
+const career=careerPredictions[hashCode(seed+"career")%careerPredictions.length];
+const health=healthPredictions[hashCode(seed+"health")%healthPredictions.length];
+
+const luckyNumber=(hashCode(seed)%9)+1;
+const luckyColor=colors[hashCode(seed+"color")%colors.length];
+
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<div class="header">
+<span>${sign.icon}</span>
+<h2>${sign.name}</h2>
+</div>
+
+<div class="section">❤️ <b>Love:</b> ${love}</div>
+<div class="section">💼 <b>Career:</b> ${career}</div>
+<div class="section">🧘 <b>Health:</b> ${health}</div>
+
+<div class="lucky">🍀 Lucky Number: ${luckyNumber}</div>
+<div class="lucky">🎨 Lucky Color: ${luckyColor}</div>
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+function updateClock(){
+
+const now=new Date();
+
+document.getElementById("liveTime").innerText=
+now.toLocaleString("en-IN",{
+weekday:"long",
+year:"numeric",
+month:"long",
+day:"numeric",
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit"
+});
+
+}
+
+setInterval(updateClock,1000);
+updateClock();
+
+generateHoroscope();
+
+function refreshAtMidnight(){
+
+const now=new Date();
+const tomorrow=new Date();
+
+tomorrow.setDate(now.getDate()+1);
+tomorrow.setHours(0,0,5,0);
+
+const time=tomorrow.getTime()-now.getTime();
+
+setTimeout(function(){
+location.reload();
+},time);
+
+}
+
+refreshAtMidnight();
+
+</script>
+
+</body>
+</html>
